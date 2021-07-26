@@ -116,7 +116,7 @@ def responder_comando(mensaje):
     else:
         pass
     tgbot.send_message(chat_id, respuesta)
-    #tgbot.send_message(chat_id, 'Comando: '+comando_sitio+'\nCiudad: '+sitio)
+    tgbot.reply_to(mensaje, respuesta)
 
 @tgbot.message_handler(func=lambda message: True)
 def echo_all(message):
