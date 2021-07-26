@@ -7,6 +7,7 @@ Created on Fri Jul 23 10:20:06 2021
 import telebot
 import unidecode
 import re
+import datetime
 import requests
 from bs4 import BeautifulSoup
 
@@ -80,11 +81,20 @@ def tbot_tiempo(sitio):     #implementación de la función tiempo
     resp_tiempo='La temperatura actual en '+nomSitio+' es de '+tempSens[0]+'\nSensación térmica de '+tempSens[1]
     return resp_tiempo
 
-def tbot_polen(sitio):      #implementación de la función polen
+def tbot_semana(sitio):      #implementación de la función semana
     url_sitio=getURL(sitio)
-    #resp_polen='El nivel de polen en '+sitio+' es de _\n'
-    resp_polen='Función por implementar\n'
-    return resp_polen
+    semanaDict={1:"Lunes",2:"Martes",3:"Miércoles",4:"Jueves",5:"Viernes",6:"Sábado",7:"Domingo",}
+    #se empieza a indexar por 1 por el formato que se devuelve en listTemp
+    inicio=datetime.datetime.today().weekday()+1
+    listaRespuesta=[]
+    listTemp=getStringTem(url_sitio)
+    
+    for i in range(inicio+1, len(listTemp)):
+        dia=semanaDict[i]
+        listaRespuesta.append(dia+': '+listTemp[i].replace('/','-')) #añadir tmp maxima y minima
+    resp_semana='\n'.join(listaRespuesta)
+    resp_semana='Las máximas y mínimas para el resto de la semana son:\n'+resp_semana
+    return resp_semana
 
 def compPagina(sitio):
     url_sitio=getURL(sitio)
@@ -102,7 +112,7 @@ def responder_comando(mensaje):
         respuesta=tbot_tiempo(sitio)
     
     elif comando_sitio in lista_comandos[1]:
-        respuesta=tbot_polen(sitio)
+        respuesta=tbot_semana(sitio)
     else:
         pass
     tgbot.send_message(chat_id, respuesta)
