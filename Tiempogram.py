@@ -6,9 +6,13 @@ Created on Fri Jul 23 10:20:06 2021
 
 import telebot
 import unidecode
+import re
+import requests
+from bs4 import BeautifulSoup
+
 
 from config import TOKEN
-lista_comandos=('tiempo', 'polen')
+lista_comandos=('tiempo', 'semana')
 
 chat_id=1267931674
 tgbot=telebot.TeleBot(TOKEN)
@@ -18,7 +22,7 @@ tgbot.send_message(chat_id, 'Tiempogram iniciado')
 @tgbot.message_handler(commands=['comandos'])
 def hola(mensaje):
     tgbot.reply_to(mensaje, 'Utiliza un comando de la siguiente lista seguido'''
-                            ' de un espacio y el nombre de tu ciudad:\n\n'''
+                            ' de un espacio y el nombre de tu ciudad:\n'''
                             ''+'\n'.join(lista_comandos))
 
 def comprobacion_sitio(mensaje):
@@ -40,12 +44,25 @@ def normalizar(sitio):      #pasa a minúscula, cambia espacios por guiones y el
     return sitio.text
 
 def getURL(sitio):          #devuelve la url de la ciudad seleccionada
-    url='https://www.eltiempo.es/'+sitio+'.html'
+    url='https://www.tiempo.com/'+sitio+'.htm'
     return url
+
+def getStringTem(url_sitio):
+    page=requests.get(url_sitio)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    resultTemp=soup.find_all('span', class_='temperatura')   #se crea el objeto ResultSet (llamado temp1 en este caso) a partir de la clase temperatura en el html de la pagina tiempo.com
+    listTemp=[]
+    for i in resultTemp:
+        listTemp.append(i.text)        #crea la lista a partir del objeto ResultSet de BeautifulSoup
+    listTemp=[i.replace(' ','') for i in listTemp]
+    return listTemp
 
 def tbot_tiempo(sitio):     #implementación de la función tiempo
     url_sitio=getURL(sitio)
-    resp_tiempo='La temperatura en '+sitio+' es de _\n'
+    listTemp=getStringTem(url_sitio)
+    patronTemp=re.compile(r'\d\d°')
+    tempSens=patronTemp.findall(listTemp[0])
+    resp_tiempo='La temperatura actual en '+sitio+' es de '+tempSens[0]+'\nSensación térmica de '+tempSens[1]
     return resp_tiempo
 
 def tbot_polen(sitio):      #implementación de la función polen
