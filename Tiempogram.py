@@ -86,11 +86,19 @@ def tbot_polen(sitio):      #implementación de la función polen
     resp_polen='Función por implementar\n'
     return resp_polen
 
+def compPagina(sitio):
+    url_sitio=getURL(sitio)
+    buscapagina=requests.get(url_sitio)
+    buscasoup = BeautifulSoup(buscapagina.content, 'html.parser')
+    resultBusca=buscasoup.find_all('span', class_='temperatura')
+    return len(resultBusca)
 
 @tgbot.message_handler(func=comprobacion_sitio)
 def responder_comando(mensaje):
     comando_sitio, sitio = acomodar(mensaje)
-    if comando_sitio in lista_comandos[0]:
+    if compPagina(sitio)==0:
+        respuesta='Comprueba que el nombre de la ciudad está escrito correctamente (no importan mayúsculas ni acentos)'
+    elif comando_sitio in lista_comandos[0]:
         respuesta=tbot_tiempo(sitio)
     
     elif comando_sitio in lista_comandos[1]:
