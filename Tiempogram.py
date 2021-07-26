@@ -50,19 +50,34 @@ def getURL(sitio):          #devuelve la url de la ciudad seleccionada
 def getStringTem(url_sitio):
     page=requests.get(url_sitio)
     soup = BeautifulSoup(page.content, 'html.parser')
-    resultTemp=soup.find_all('span', class_='temperatura')   #se crea el objeto ResultSet (llamado temp1 en este caso) a partir de la clase temperatura en el html de la pagina tiempo.com
+    resultTemp=soup.find_all('span', class_='temperatura')   #se crea el objeto ResultSet a partir de la clase temperatura en el html de la pagina tiempo.com
     listTemp=[]
     for i in resultTemp:
         listTemp.append(i.text)        #crea la lista a partir del objeto ResultSet de BeautifulSoup
     listTemp=[i.replace(' ','') for i in listTemp]
     return listTemp
 
+def getSitio(url_sitio):
+    page=requests.get(url_sitio)
+    soupnom = BeautifulSoup(page.content, 'html.parser')
+    nomSoup=soupnom.find_all('span', class_='titulo')
+    nomSitio=[]
+    for i in nomSoup:
+        nomSitio.append(i.text)
+
+    inicio=nomSitio[0].find('El tiempo en ')
+    fin=nomSitio[0].find(' hoy')
+
+    nombreSitio=nomSitio[0][(inicio+len('El tiempo en ')):(fin)]
+    return nombreSitio
+
 def tbot_tiempo(sitio):     #implementación de la función tiempo
     url_sitio=getURL(sitio)
     listTemp=getStringTem(url_sitio)
+    nomSitio=getSitio(url_sitio)
     patronTemp=re.compile(r'\d\d°')
     tempSens=patronTemp.findall(listTemp[0])
-    resp_tiempo='La temperatura actual en '+sitio+' es de '+tempSens[0]+'\nSensación térmica de '+tempSens[1]
+    resp_tiempo='La temperatura actual en '+nomSitio+' es de '+tempSens[0]+'\nSensación térmica de '+tempSens[1]
     return resp_tiempo
 
 def tbot_polen(sitio):      #implementación de la función polen
