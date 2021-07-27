@@ -1,8 +1,8 @@
 # tiempogram-repo
 Bot para telegram
 
-Funcionalidades:
+Funcionalidades:  
 Comandos tiempo y semana
 
-Futuras implementaciones:
+Futuras implementaciones:  
 Comandos para información de lluvia, viento..., comando para indice UV
