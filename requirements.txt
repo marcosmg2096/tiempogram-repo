@@ -1,0 +1,5 @@
+pyTelegramBotAPI
+unidecode
+beautifulsoup4
+requests
+datetime
